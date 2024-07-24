@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.mybest.myled"
         minSdkVersion 27
-        targetSdkVersion 30
+        //noinspection EditedTargetSdkVersion
+        targetSdkVersion 34
         versionCode 4
         versionName "4.0"
 
@@ -29,19 +29,20 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.mybest.myled'
 
 }
 
 dependencies {
-    def lifecycle_version = "2.2.0"
+    def lifecycle_version = "2.8.3"
 
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'com.github.kristiyanP:colorpicker:v1.1.10'
     implementation 'com.github.duanhong169:colorpicker:1.1.6'
 
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"

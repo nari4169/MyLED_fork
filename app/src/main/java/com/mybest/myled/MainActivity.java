@@ -1,6 +1,7 @@
 package com.mybest.myled;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -19,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -56,13 +58,19 @@ import petrov.kristiyan.colorpicker.ColorPicker;
 import top.defaults.colorpicker.ColorPickerPopup;
 
 
+@RequiresApi(api = Build.VERSION_CODES.S)
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     static final int REQUEST_ENABLE_BT = 100;
     static final int REQUEST_PERMISSIONS = 101;
 
-    String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+    String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.ACCESS_FINE_LOCATION};
 
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터
     BluetoothDevice bluetoothDevice;    // 블루투스 장치
@@ -79,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     byte[] colors = new byte[5]; // 블루투스 기기로 보낼 byte 배열 데이터
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() { // 브로드캐스트 리시버
+        @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -93,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
+    @SuppressLint("MissingPermission")
     private void add(BluetoothDevice device) {
         if(!(pairedDevices.contains(device))) { // 페어링된 장치에 없고
             if(unpairedDevices.add(device)) { // 장치가 추가된다면(중복이 아니라면)
@@ -256,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
     }
     // 기기검색
     // 이미 페어링된 블루투스 기기 검색
+    @SuppressLint("MissingPermission")
     private void selectPairedDevice() {
         pairedDevices = bluetoothAdapter.getBondedDevices();
 
@@ -287,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 페어링되지 않은 기기 검색
+    @SuppressLint("MissingPermission")
     private void selectUnpairedDevice() {
         // 이미 검색 중이라면 검색을 종료하고, 다시 검색 시작
         if(bluetoothAdapter.isDiscovering()) {
@@ -316,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 기기 연결 준비
     // 블루투스 페어링된 목록에서 디바이스 장치 가져오기
+    @SuppressLint("MissingPermission")
     private BluetoothDevice getPairedDevice(String name) {
         BluetoothDevice selectedDevice = null;
 
@@ -328,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
         return selectedDevice;
     }
     // 페어링되지 않은 장치 목록에서 디바이스 장치 가져오기
+    @SuppressLint("MissingPermission")
     private BluetoothDevice getUnpairedDevice(String name) {
         BluetoothDevice selectedDevice = null;
 
@@ -365,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         Thread thread = new Thread(new Runnable() {
+            @SuppressLint("MissingPermission")
             public void run() {
                 if(paired)
                     bluetoothDevice = getPairedDevice(selectedDeviceName);
@@ -483,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         // 권한이 하나라도 없는 경우
-        if(requestList.size()>0) {
+        if(!requestList.isEmpty()) {
             String[] requests = requestList.toArray(new String[requestList.size()]);
             ActivityCompat.requestPermissions(this, requests, REQUEST_PERMISSIONS);
         }
@@ -516,13 +532,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.setting:
-                Intent intent = new Intent(this, LicenseActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.setting) {
+            Intent intent = new Intent(this, LicenseActivity.class);
+            startActivity(intent);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }
